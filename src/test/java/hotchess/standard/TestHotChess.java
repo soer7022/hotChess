@@ -4,6 +4,7 @@ import hotchess.framework.Game;
 import hotchess.framework.GameConstants;
 import hotchess.framework.Player;
 import hotchess.framework.Position;
+import hotchess.pieces.Pond;
 import org.junit.*;
 
 import static org.junit.Assert.*;
@@ -14,7 +15,7 @@ public class TestHotChess {
     private Game game;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.game = new GameImpl();
     }
 
@@ -54,12 +55,21 @@ public class TestHotChess {
 
     @Test
     public void canMoveWhitePondForwardsTwoStepsInOneTurn() {
-        assertThat(game.movePiece(new Position(0,0), new Position(2,0)),is(true));
-        assertThat(game.getPieceAt(new Position(2,0)).getType(), is(notNullValue()));
+        assertThat(game.movePiece(new Position(1, 0), new Position(3, 0)), is(true));
+        System.out.println("Moved piece");
+        assertThat(game.getPieceAt(new Position(3, 0)), is(notNullValue()));
     }
 
     @Test
     public void canNotMoveBlackPondOnWhitesTurn() {
-        assertThat(game.movePiece(new Position(6,0), new Position(5,0)), is(false));
+        assertThat(game.movePiece(new Position(6, 0), new Position(5, 0)), is(false));
+    }
+
+    @Test
+    public void whitePondCanAttackAndKillBlackPond() {
+        game.placePieceAt(new Position(2, 1), new Pond(Player.BLACK));
+        assertThat(game.getPieceAt(new Position(2, 1)).getOwner(), is(Player.BLACK));
+        game.movePiece(new Position(1, 0), new Position(2, 1));
+        assertThat(game.getPieceAt(new Position(2, 1)).getOwner(), is(Player.WHITE));
     }
 }

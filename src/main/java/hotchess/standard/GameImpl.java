@@ -10,8 +10,8 @@ import hotchess.pieces.Rook;
 import java.util.HashMap;
 
 public class GameImpl implements Game {
-    Player currentPlayer;
-    HashMap<Position, Piece> pieceMap;
+    private Player currentPlayer;
+    private HashMap<Position, Piece> pieceMap;
 
     public GameImpl() {
         // White always starts
@@ -40,12 +40,21 @@ public class GameImpl implements Game {
 
     @Override
     public boolean movePiece(Position from, Position to) {
+        boolean isAttacking = false;
         // Store the piece to be move so that we can move it later
         Piece pieceToMove = getPieceAt(from);
+        boolean isMovingOnTopOfOtherPiece = getPieceAt(to) != null;
+        if (isMovingOnTopOfOtherPiece) {
+            if (getPieceAt(to).getOwner() == currentPlayer) {
+                return false;
+            } else {
+                isAttacking = true;
+            }
+        }
         // Check if the current player is the owner
-        if (pieceToMove.getOwner() == getCurrentPlayer()) return false;
+        if (pieceToMove.getOwner() != getCurrentPlayer()) return false;
         // Check if the move is legal
-        boolean pieceCanBeLegallyMoved = getPieceAt(from).isLegalMove(from, to, false);
+        boolean pieceCanBeLegallyMoved = getPieceAt(from).isLegalMove(from, to, isAttacking);
         if (pieceCanBeLegallyMoved) {
             // Move the piece
             removePieceAt(from);
